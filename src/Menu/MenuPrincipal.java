@@ -427,13 +427,15 @@ public class MenuPrincipal extends JFrame implements IAgregarPaciente {
     @Override
     public void pacientes() { 
                 
-        Object[] opciones = {"1. Consultar paciente", "4. Listado de pacientes"};
+        Object[] opciones = {"1. Consultar paciente", "2. Actualizar paciente", "3. Eliminar paciente", "4. Listado de pacientes"};
         
         int opcionSeleciconada = JOptionPane.showOptionDialog(this, "SELECCIONE OPCION", "== PACIENTES ==", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE,  null, opciones, opciones[0]);
         
         switch (opcionSeleciconada) {
             case 0 -> consultarPacienteID();
-            case 1 -> filtrarPacientes();
+            case 1 -> actualizarPacientes();
+            case 2 -> eliminarPaciente();
+            case 3 -> filtrarPacientes();
             default -> JOptionPane.showMessageDialog(this, "Opcion Invalida.");
         }
     }
@@ -466,6 +468,153 @@ public class MenuPrincipal extends JFrame implements IAgregarPaciente {
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this, "ERROR al consultar paciente.");
         }       
+    }
+    
+    /**
+     * Metodo para actualizar la informacion de un paciente.
+     * Este metodo muestra la informacion de un paciente y al seleccionarlo podra actualizar su informacion
+     */
+    public void actualizarPacientes() {
+        
+        JPanel panelActualizacion = new JPanel();
+        panelActualizacion.setLayout(new BoxLayout(panelActualizacion, BoxLayout.Y_AXIS));
+        
+        try {                    
+            var pacientes = persistencia.listarPacientes();
+            if (pacientes.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "ERROR: No existen pacientes");
+                return;
+            }            
+            
+            String[] columnas = {"ID", "NOMBRE", "EDAD", "DIRECCION"};
+            
+            Object[][] filas = new Object[pacientes.size()][4];
+            for (int i = 0; i < pacientes.size(); i++) {
+                Paciente paciente = pacientes.get(i);
+                filas[i][0] = paciente.getId();
+                filas[i][1] = paciente.getNombre();
+                filas[i][2] = paciente.getEdad();
+                filas[i][3] = paciente.getDireccion();
+            }
+            modeloTabla.setDataVector(filas, columnas);
+            panelDerecho.removeAll();
+            panelDerecho.revalidate();
+            panelDerecho.repaint();
+                
+            String id = JOptionPane.showInputDialog(this, "Ingrese ID del paciente a actualizar:");
+            int idPacienteAct = Integer.parseInt(id);
+            
+            Paciente pacienteA = persistencia.obtenerPacientePorId(idPacienteAct);                    
+            if (pacienteA == null) {
+                JOptionPane.showMessageDialog(this, "ERROR: No existe paciente con ID proporcionada.");                   
+                return;
+            }
+                                
+            JTextField nombrePaciente = new JTextField();
+            JTextField edadPaciente = new JTextField();
+            JTextField direccionPaciente = new JTextField();
+        
+            panelActualizacion.add(new JLabel("NOMBRE PACIENTE:"));
+            panelActualizacion.add(nombrePaciente);
+            panelActualizacion.add(new JLabel("EDAD PACIENTE:"));
+            panelActualizacion.add(edadPaciente);
+            panelActualizacion.add(new JLabel("DIRECCION PACIENTE:"));
+            panelActualizacion.add(direccionPaciente);
+            
+            int resultado = JOptionPane.showConfirmDialog(this, panelActualizacion, "== Actualizar Paciente ==", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+            
+            if (resultado == JOptionPane.OK_OPTION) {
+                try {
+                    String nombre = nombrePaciente.getText();
+                    int edad = Integer.parseInt(edadPaciente.getText().trim());
+                    String direccion = direccionPaciente.getText();
+                    
+                    Paciente pacienteAct = new Paciente(pacienteA.getId(), nombre, edad, direccion);
+                    persistencia.actualizarPaciente(pacienteAct);
+                    JOptionPane.showMessageDialog(this, "Paciente actualizado correctamente");  
+                        
+                    pacientes = persistencia.listarPacientes();
+                    filas = new Object[pacientes.size()][4];                        
+                    for (int i = 0; i < pacientes.size(); i++) {
+                        Paciente p = pacientes.get(i);                          
+                        filas[i][0] = p.getId();
+                        filas[i][1] = p.getNombre();
+                        filas[i][2] = p.getEdad();
+                        filas[i][3] = p.getDireccion();
+                    }  
+            
+                    modeloTabla.setDataVector(filas, columnas);                
+                    panelDerecho.removeAll();
+                    panelDerecho.revalidate();
+                    panelDerecho.repaint();
+                } catch (NumberFormatException e) {
+                    JOptionPane.showMessageDialog(this, "Error: formato de número invalido.");
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(this, "Error al actualizar" + ex.getMessage());
+                }
+            }                          
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(this, "ERROR: ID invalido");
+        } catch(Exception ex) {
+            JOptionPane.showMessageDialog(this, "ERROR: " + ex.getMessage());
+        }
+    }
+    
+   /**
+     * Metodo para eliminar un paciente. 
+     */
+    public void eliminarPaciente() {        
+        JButton btnEliminar = new JButton("Eliminar");        
+        try {
+            var pacientes = persistencia.listarPacientes();
+            if (pacientes.isEmpty()) {
+                JOptionPane.showMessageDialog(this,"Error: No existen pacientes.");
+                return;
+            }                        
+            
+            String[] columnas = {"ID", "NOMBRE", "EDAD", "DIRECCION"};
+            
+            Object[][] filas = new Object[pacientes.size()][4];
+            for (int i = 0; i < pacientes.size(); i++) {
+                Paciente paciente = pacientes.get(i);
+                filas[i][0] = paciente.getId();
+                filas[i][1] = paciente.getNombre();
+                filas[i][2] = paciente.getEdad();
+                filas[i][3] = paciente.getDireccion();
+            }
+            modeloTabla.setDataVector(filas, columnas);
+            tabla.setDefaultEditor(Object.class, null);
+            panelDerecho.removeAll();            
+            panelDerecho.add(btnEliminar);
+            panelDerecho.revalidate();
+            panelDerecho.repaint();            
+            
+            btnEliminar.addActionListener((ActionEvent e) -> {
+                int fila = tabla.getSelectedRow();
+                
+                if (fila  == -1) {
+                    JOptionPane.showMessageDialog(this, "Selecciones paciente a eliminar.");
+                    return;
+                }
+                
+                int id = (int) modeloTabla.getValueAt(fila, 0);
+                
+                int resultado = JOptionPane.showConfirmDialog(this, "Â¿Seguro desea eliminar el paciente?","== Eliminar Paciente ==", JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
+                if (resultado == JOptionPane.OK_OPTION) {
+                    try {
+                        persistencia.eliminarPaciente(id);
+                        modeloTabla.removeRow(fila);
+                        JOptionPane.showMessageDialog(this, "Paciente eliminado correctamente.");                        
+                    } catch (Exception et) {
+                        JOptionPane.showMessageDialog(this,"Error al eliminar paciente.");
+                    }
+                }
+            });
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "Error al mostrar pacientes.");
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "ERROR: " + ex.getMessage());
+        }
     }
         
     /**
@@ -606,13 +755,15 @@ public class MenuPrincipal extends JFrame implements IAgregarPaciente {
     }
     
     public void medicosId() {
-        Object[] opciones = {"1. Consultar médico", "4. Listado de médicos"};
+        Object[] opciones = {"1. Consultar médico", "2. Actualizar médico", "3. Eliminar médico", "4. Listado de médicos"};
         
         int opcionSeleccionada = JOptionPane.showOptionDialog(this, "SELECCIONE OPCION", "== MEDICOS ==", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, opciones, opciones[0]);
 
         switch (opcionSeleccionada) {
             case 0 -> consultarMedicoID();
-            case 1 -> listarMedicos();
+            case 1 -> actualizarMedico();
+            case 2 -> eliminarMedico();
+            case 3 -> listarMedicos();
             default -> JOptionPane.showMessageDialog(this, "Opcion Invalida.");
         }
     }
@@ -649,6 +800,157 @@ public class MenuPrincipal extends JFrame implements IAgregarPaciente {
             JOptionPane.showMessageDialog(this, "ERROR: Formato de ID inválido. Por favor, ingrese un número.", "ERROR", JOptionPane.ERROR_MESSAGE);
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this, "ERROR al consultar médico: " + ex.getMessage(), "ERROR", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    public void actualizarMedico() {
+        try {
+            List<Medico> medicos = persistencia.listarMedicos();
+            if (medicos.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "ERROR: No hay médicos registrados.");
+                return;
+            }
+
+            // Muestra la lista de médicos en la tabla para que el usuario pueda ver los IDs
+            String[] columnas = {"ID", "NOMBRE", "ESPECIALIDAD", "ID ESPECIALIDAD"};
+            Object[][] filas = new Object[medicos.size()][4];
+            for (int i = 0; i < medicos.size(); i++) {
+                Medico medico = medicos.get(i);
+                filas[i][0] = medico.getId();
+                filas[i][1] = medico.getNombre();
+                filas[i][2] = medico.getEspecialidad().getNombre();
+                filas[i][3] = medico.getEspecialidad().getId();
+            }
+            modeloTabla.setDataVector(filas, columnas);
+            panelDerecho.removeAll();
+            panelDerecho.revalidate();
+            panelDerecho.repaint();
+
+            String idStr = JOptionPane.showInputDialog(this, "Ingrese el ID del médico a actualizar:");
+            if (idStr == null || idStr.trim().isEmpty()) {
+                return;
+            }
+            int idMedicoAct = Integer.parseInt(idStr);
+
+            Medico medicoA = persistencia.obtenerMedicoPorId(idMedicoAct);
+            if (medicoA == null) {
+                JOptionPane.showMessageDialog(this, "ERROR: No existe médico con el ID proporcionado.");
+                return;
+            }
+
+            JPanel panelActualizacion = new JPanel();
+            panelActualizacion.setLayout(new BoxLayout(panelActualizacion, BoxLayout.Y_AXIS));
+
+            JTextField nombreMedico = new JTextField(medicoA.getNombre());
+            JTextField idEspecialidad = new JTextField(String.valueOf(medicoA.getEspecialidad().getId()));
+
+            panelActualizacion.add(new JLabel("Nuevo nombre del médico:"));
+            panelActualizacion.add(nombreMedico);
+            panelActualizacion.add(new JLabel("Nuevo ID de especialidad:"));
+            panelActualizacion.add(idEspecialidad);
+
+            int resultado = JOptionPane.showConfirmDialog(this, panelActualizacion, "Actualizar Médico", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+
+            if (resultado == JOptionPane.OK_OPTION) {
+                String nuevoNombre = nombreMedico.getText();
+                int nuevoIdEspecialidad = Integer.parseInt(idEspecialidad.getText().trim());
+
+                Especialidad especialidad = persistencia.obtenerEspecialidadPorId(nuevoIdEspecialidad);
+                if (especialidad == null) {
+                    JOptionPane.showMessageDialog(this, "Error: No existe especialidad con el ID proporcionado.");
+                    return;
+                }
+
+                // Línea corregida aquí
+                  Medico medicoActualizado = new Medico(medicoA.getId(), nuevoNombre, especialidad);
+
+                persistencia.actualizarMedico(medicoActualizado);
+                JOptionPane.showMessageDialog(this, "Médico actualizado correctamente.");
+
+                // Vuelve a listar los médicos para reflejar el cambio en la tabla
+                medicos = persistencia.listarMedicos();
+                filas = new Object[medicos.size()][4];
+                for (int i = 0; i < medicos.size(); i++) {
+                    Medico m = medicos.get(i);
+                    filas[i][0] = m.getId();
+                    filas[i][1] = m.getNombre();
+                    filas[i][2] = m.getEspecialidad().getNombre();
+                    filas[i][3] = m.getEspecialidad().getId();
+                }
+                modeloTabla.setDataVector(filas, columnas);
+            }
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "ERROR: ID o formato de número inválido.", "Error", JOptionPane.ERROR_MESSAGE);
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "Error al actualizar el médico: " + ex.getMessage());
+        }
+    }
+    
+    public void eliminarMedico() {
+        try {
+            var medicos = persistencia.listarMedicos();
+            if (medicos.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "ERROR: No existen médicos registrados.");
+                return;
+            }
+
+            String[] columnas = {"ID", "NOMBRE", "ESPECIALIDAD", "ID ESPECIALIDAD"};
+            Object[][] filas = new Object[medicos.size()][4];
+            for (int i = 0; i < medicos.size(); i++) {
+                Medico medico = medicos.get(i);
+                filas[i][0] = medico.getId();
+                filas[i][1] = medico.getNombre();
+                filas[i][2] = medico.getEspecialidad().getNombre();
+                filas[i][3] = medico.getEspecialidad().getId();
+            }
+            modeloTabla.setDataVector(filas, columnas);
+            panelDerecho.removeAll();
+            panelDerecho.revalidate();
+            panelDerecho.repaint();
+
+            String idStr = JOptionPane.showInputDialog(this, "Ingrese el ID del médico a eliminar:");
+            if (idStr == null || idStr.trim().isEmpty()) {
+                return; // El usuario canceló o no ingresó nada
+            }
+
+            int id = Integer.parseInt(idStr);
+            Medico medicoAEliminar = persistencia.obtenerMedicoPorId(id);
+
+            if (medicoAEliminar == null) {
+                JOptionPane.showMessageDialog(this, "ERROR: No existe un médico con el ID proporcionado.");
+                return;
+            }
+
+            int confirmacion = JOptionPane.showConfirmDialog(
+                this,
+                "¿Está seguro de que desea eliminar al médico " + medicoAEliminar.getNombre() + "?",
+                "Confirmar Eliminación",
+                JOptionPane.YES_NO_OPTION
+            );
+
+            if (confirmacion == JOptionPane.YES_OPTION) {
+                persistencia.eliminarMedico(medicoAEliminar);
+                JOptionPane.showMessageDialog(this, "Médico eliminado correctamente.");
+
+                // Volver a listar los médicos para reflejar los cambios
+                medicos = persistencia.listarMedicos();
+                filas = new Object[medicos.size()][4];
+                for (int i = 0; i < medicos.size(); i++) {
+                    Medico m = medicos.get(i);
+                    filas[i][0] = m.getId();
+                    filas[i][1] = m.getNombre();
+                    filas[i][2] = m.getEspecialidad().getNombre();
+                    filas[i][3] = m.getEspecialidad().getId();
+                }
+                modeloTabla.setDataVector(filas, columnas);
+                panelDerecho.removeAll();
+                panelDerecho.revalidate();
+                panelDerecho.repaint();
+            }
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "ERROR: ID inválido. Asegúrese de ingresar un número.", "Error", JOptionPane.ERROR_MESSAGE);
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "ERROR al eliminar el médico: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -705,13 +1007,14 @@ public class MenuPrincipal extends JFrame implements IAgregarPaciente {
          }
          actualizarTabla(columnas, consultas);
          
-         Object[] opciones = {"1. Filtrar por ID Paciente", "2. Filtrar por ID Médico", "3. Filtrar por Periodo"};
+         Object[] opciones = {"1. Filtrar por ID Paciente", "2. Filtrar por ID Médico", "3. Filtrar por Periodo", "4. Cancelar Consulta"};
          int opcionSeleccionada = JOptionPane.showOptionDialog(this, "SELECCIONE OPCION", "== PACIENTES ==", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE,  null, opciones, opciones[0]);
 
          switch (opcionSeleccionada) {
              case 0 -> filtrarPacienteID();
              case 1 -> filtrarMedicoID();
-             case 2 -> filtrarFechaPeriodo(); 
+             case 2 -> filtrarFechaPeriodo();
+             case 3 -> cancelarConsulta(); 
              default -> JOptionPane.showMessageDialog(this, "Opcion Invalida.");
          }
      }
@@ -819,12 +1122,36 @@ public class MenuPrincipal extends JFrame implements IAgregarPaciente {
         }
     }
     
+    public void cancelarConsulta(){
+        String[] columnas = {"ID","PACIENTE","MÉDICO","FECHA","ESTADO"};
+        String idConsulta = JOptionPane.showInputDialog("Ingrese ID de la consulta a cancelar","Ingrese el ID de la consulta" );
+        for(int i=0;i<consultas.size();i++){
+            String idConsultaCancelada = String.valueOf(consultas.get(i).getId());
+            if(idConsultaCancelada.equals(idConsulta)){
+                int confirmacionCancelar = JOptionPane.showConfirmDialog(this, "¿Cancelar Consulta?"+
+                    "\nID: " + consultas.get(i).getId() +
+                    "\nPaciente: " + consultas.get(i).getPaciente()+
+                    "\nMedico: " +consultas.get(i).getMedico()+
+                    "\nFecha de la ctia: " +consultas.get(i).getFecha()
+                    ,"Confirmar cancelación"
+                    ,JOptionPane.YES_NO_OPTION
+                );
+                if(confirmacionCancelar == 0){
+                    consultas.get(i).setEstado("Cancelada");
+                }
+            }
+        }
+        actualizarTabla(columnas, consultas);
+    }
+
     public void equiposMedicos() {
         Object[] opciones = {
             "1. Consultar equipo por ID",
-            "2. Listar todos los equipos",
-            "3. Filtrar equipos",
-            "4. Inventariar equipo"
+            "2. Actualizar equipo",
+            "3. Eliminar equipo",
+            "4. Listar todos los equipos",
+            "5. Filtrar equipos",
+            "6. Inventariar equipo"
         }; 
         int opcionSeleccionada = JOptionPane.showOptionDialog(
             this, 
@@ -839,9 +1166,11 @@ public class MenuPrincipal extends JFrame implements IAgregarPaciente {
 
         switch (opcionSeleccionada) {
             case 0 -> consultarEquipoID();
-            case 1 -> listarEquiposMedicos();
-            case 2 -> filtrarEquipos();
-            case 3 -> inventariarEquipo();
+            case 1 -> actualizarEquipo();
+            case 2 -> eliminarEquipo();
+            case 3 -> listarEquiposMedicos();
+            case 4 -> filtrarEquipos();
+            case 5 -> inventariarEquipo();
             default -> JOptionPane.showMessageDialog(this, "Opción inválida.");
         }
     }
@@ -939,6 +1268,64 @@ public class MenuPrincipal extends JFrame implements IAgregarPaciente {
 
     }
 
+    public void eliminarEquipo() {
+        try {
+            var equipos = persistencia.listarEquiposMedicos();
+            if (equipos.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "ERROR: No existen equipos médicos.");
+                return;
+            }
+
+            // Muestra la lista de equipos en la tabla para que el usuario pueda ver los IDs
+            String[] columnas = {"ID", "NOMBRE", "CANTIDAD"};
+            Object[][] filas = new Object[equipos.size()][3];
+            for (int i = 0; i < equipos.size(); i++) {
+                EquipoMedico equipo = equipos.get(i);
+                filas[i][0] = equipo.getId();
+                filas[i][1] = equipo.getNombre();
+                filas[i][2] = equipo.getCantidad();
+            }
+            modeloTabla.setDataVector(filas, columnas);
+            panelDerecho.removeAll();
+            panelDerecho.revalidate();
+            panelDerecho.repaint();
+
+            String idStr = JOptionPane.showInputDialog(this, "Ingrese el ID del equipo a eliminar:");
+            if (idStr == null || idStr.trim().isEmpty()) {
+                return;
+            }
+
+            int id = Integer.parseInt(idStr);
+
+            // Obtiene el objeto para mostrar su nombre en el mensaje de confirmación
+            EquipoMedico equipoAEliminar = persistencia.obtenerEquipoPorId(id);
+            if (equipoAEliminar == null) {
+                JOptionPane.showMessageDialog(this, "ERROR: No existe un equipo con el ID proporcionado.");
+                return;
+            }
+
+            int confirmacion = JOptionPane.showConfirmDialog(
+                this, 
+                "¿Está seguro de que desea eliminar el equipo " + equipoAEliminar.getNombre() + "?", 
+                "Confirmar Eliminación", 
+                JOptionPane.YES_NO_OPTION
+            );
+
+            if (confirmacion == JOptionPane.YES_OPTION) {
+                // Llama a la fachada para eliminar el equipo
+                persistencia.eliminarEquipoMedico(equipoAEliminar);
+                JOptionPane.showMessageDialog(this, "Equipo médico eliminado correctamente.");
+
+                // Actualiza la tabla para reflejar los cambios
+                actualizarTablaEquipos();
+            }
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "ERROR: ID inválido. Asegúrese de ingresar un número.", "Error", JOptionPane.ERROR_MESSAGE);
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "ERROR al eliminar el equipo médico: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
     // Método auxiliar para actualizar la tabla de equipos
     private void actualizarTablaEquipos() {
         try {
@@ -957,6 +1344,85 @@ public class MenuPrincipal extends JFrame implements IAgregarPaciente {
             panelDerecho.repaint();
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Error al actualizar la tabla de equipos: " + e.getMessage());
+        }
+    }
+
+    public void actualizarEquipo() {
+        try {
+            var equipos = persistencia.listarEquiposMedicos();
+            if (equipos.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "ERROR: No existen equipos médicos.");
+                return;
+            }
+
+            // Muestra la lista de equipos en la tabla
+            String[] columnas = {"ID", "NOMBRE", "CANTIDAD"};
+            Object[][] filas = new Object[equipos.size()][3];
+            for (int i = 0; i < equipos.size(); i++) {
+                EquipoMedico equipo = equipos.get(i);
+                filas[i][0] = equipo.getId();
+                filas[i][1] = equipo.getNombre();
+                filas[i][2] = equipo.getCantidad();
+            }
+            modeloTabla.setDataVector(filas, columnas);
+            panelDerecho.removeAll();
+            panelDerecho.revalidate();
+            panelDerecho.repaint();
+
+            String idStr = JOptionPane.showInputDialog(this, "Ingrese el ID del equipo a actualizar:");
+            if (idStr == null || idStr.trim().isEmpty()) {
+                return;
+            }
+            int idEquipoAct = Integer.parseInt(idStr);
+            EquipoMedico equipoA = persistencia.obtenerEquipoPorId(idEquipoAct);
+
+            if (equipoA == null) {
+                JOptionPane.showMessageDialog(this, "ERROR: No existe un equipo con el ID proporcionado.");
+                return;
+            }
+
+            JTextField nombreEquipo = new JTextField(equipoA.getNombre());
+            JTextField cantidadEquipo = new JTextField(String.valueOf(equipoA.getCantidad()));
+
+            JPanel panelActualizacion = new JPanel();
+            panelActualizacion.setLayout(new BoxLayout(panelActualizacion, BoxLayout.Y_AXIS));
+            panelActualizacion.add(new JLabel("NOMBRE EQUIPO:"));
+            panelActualizacion.add(nombreEquipo);
+            panelActualizacion.add(new JLabel("CANTIDAD:"));
+            panelActualizacion.add(cantidadEquipo);
+
+            int resultado = JOptionPane.showConfirmDialog(
+                this, 
+                panelActualizacion, 
+                "== Actualizar Equipo Médico ==", 
+                JOptionPane.OK_CANCEL_OPTION, 
+                JOptionPane.PLAIN_MESSAGE
+            );
+
+            if (resultado == JOptionPane.OK_OPTION) {
+                try {
+                    String nombre = nombreEquipo.getText();
+                    int cantidad = Integer.parseInt(cantidadEquipo.getText().trim());
+
+                    if (nombre.isEmpty()) {
+                        JOptionPane.showMessageDialog(this, "ERROR: El campo 'NOMBRE' no puede estar vacío.", "Error", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+
+                    EquipoMedico equipoAct = new EquipoMedico(equipoA.getId(), nombre, cantidad);
+                    persistencia.actualizarEquipoMedico(equipoAct);
+                    JOptionPane.showMessageDialog(this, "Equipo médico actualizado correctamente.");
+
+                    // Actualiza la tabla para reflejar los cambios
+                    actualizarTablaEquipos();
+                } catch (NumberFormatException e) {
+                    JOptionPane.showMessageDialog(this, "ERROR: Formato de número inválido para la cantidad.", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(this, "ERROR: ID de equipo inválido.", "Error", JOptionPane.ERROR_MESSAGE);
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "ERROR al actualizar el equipo médico: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
