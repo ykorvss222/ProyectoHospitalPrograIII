@@ -1,9 +1,5 @@
 package Persistencia;
 
-/**
- *
- * @author Enrique Osuna
- */
 import Entidades.Especialidad;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,6 +12,11 @@ public class PersistenciaEspecialidades {
         this.especialidades = new ArrayList<>();
     }
 
+    /**
+     * método para agregar una especialidad médica
+     * @param especialidad
+     * @throws Exception si ya existe
+     */
     public void agregarEspecialidad(Especialidad especialidad) throws Exception {
         // Validar que el ID sea único
         for (Especialidad e : especialidades) {
@@ -26,6 +27,12 @@ public class PersistenciaEspecialidades {
         this.especialidades.add(especialidad);
     }
 
+    /**
+     * método para obtener información de una especialidad por id
+     * @param id a buscar
+     * @return especialidad
+     * @throws Exception si no se encuentra
+     */
     public Especialidad obtenerEspecialidadPorId(int id) throws Exception {
         for (Especialidad e : especialidades) {
             if (e.getId() == id) {

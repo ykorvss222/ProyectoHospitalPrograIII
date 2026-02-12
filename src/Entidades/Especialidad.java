@@ -1,9 +1,5 @@
 package Entidades;
 
-/**
- *
- * @author Enrique Osuna
- */
 public class Especialidad {
     
     private int id;

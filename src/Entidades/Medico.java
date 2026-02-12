@@ -1,9 +1,5 @@
 package Entidades;
 
-/**
- *
- * @author Enrique Osuna
- */
 public class Medico {
     
     private int id;

@@ -1,9 +1,5 @@
 package Persistencia;
 
-/**
- *
- * @author Enrique Osuna
- */
 import Entidades.*;
 import java.util.List;
 import java.util.logging.Level;

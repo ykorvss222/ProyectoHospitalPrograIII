@@ -1,9 +1,5 @@
 package Persistencia;
 
-/**
- *
- * @author Enrique Osuna
- */
 import Entidades.Consulta;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +13,11 @@ public class PersistenciaConsultas {
         this.consultas = new ArrayList<>();
     }
 
+    /**
+     * método para programar una consulta
+     * @param consulta 
+     * @throws Exception si ya existe
+     */
     public void programarConsulta(Consulta consulta) throws Exception {
         // Validar que el ID sea único
         for (Consulta c : consultas) {
@@ -34,6 +35,10 @@ public class PersistenciaConsultas {
         this.consultas.add(consulta);
     }
     
+    /**
+     * método para verificar el estado de una consulta
+     * @param consulta 
+     */
     public void determinarEstado(Consulta consulta){
         LocalDate hoy = LocalDate.now();
         LocalDate fechaConsulta = LocalDate.parse(consulta.getFecha());

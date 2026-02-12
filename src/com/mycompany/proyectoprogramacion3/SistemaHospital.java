@@ -1,12 +1,16 @@
- 
-package com.mycompany.proyectoprogramacion3;
+ package com.mycompany.proyectoprogramacion3;
 
 import Menu.MenuPrincipal;
 import Persistencia.*;
 
-
- 
-public class ProyectoProgramacion3 {
+/*
+ INTEGRANTES:
+ JORGE MAYORQUIN URBINA URIAS
+ JAVIER ENRIQUE VALENZUELA TRUJILLO
+ YAZID ENRIQUE REVILLA BERNAL
+ REPOSITORIO: https://github.com/ykorvss222/ProyectoHospitalPrograIII
+ */
+public class SistemaHospital {
 
     public static void main(String[] args) {
         IPersistenciaFachada persistencia = new PersistenciaFachada();

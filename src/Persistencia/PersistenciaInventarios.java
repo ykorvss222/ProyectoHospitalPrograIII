@@ -13,6 +13,11 @@ public class PersistenciaInventarios {
         this.inventarios = new ArrayList<>();
     }
 
+    /**
+     * método para agregar un equipo médico
+     * @param equipo
+     * @throws Exception si ya existe
+     */
     public void agregarEquipoMedico(EquipoMedico equipo) throws Exception {
         // Validar que el ID sea único
         for (EquipoMedico e : inventarios) {
@@ -26,7 +31,12 @@ public class PersistenciaInventarios {
         this.inventarios.add(equipo);
     }
 
-    // Método para buscar un equipo por su ID
+    /**
+     * Método para buscar un equipo por su ID
+     * @param id a buscar
+     * @return equipo
+     * @throws Exception si no se encuentra
+     */
     public EquipoMedico obtenerEquipoPorId(int id) throws Exception {
         for (EquipoMedico equipo : inventarios) {
             if (equipo.getId() == id) {
@@ -37,7 +47,12 @@ public class PersistenciaInventarios {
         return null; 
     }
     
-    
+    /**
+     * método para actualizar la cantidad de inventario de un equipo
+     * @param id del equipo
+     * @param cantidad
+     * @throws Exception si es invalido
+     */
     public void actualizarCantidadEquipo(int id, int cantidad) throws Exception {
         // Validar que el equipo exista y la nueva cantidad sea válida
         for (EquipoMedico e : inventarios) {
@@ -56,9 +71,13 @@ public class PersistenciaInventarios {
         return new ArrayList<>(inventarios);
     }
     
-    
-    
-    
+    /**
+     * método para filtrar la búsqueda de un equipo médico
+     * @param nombreFiltro
+     * @param cantidadMinima
+     * @param cantidadMaxima
+     * @return equipo
+     */
     public List<EquipoMedico> filtrarEquipos(String nombreFiltro, int cantidadMinima, int cantidadMaxima) {
         List<EquipoMedico> equiposFiltrados = new ArrayList<>();
   
@@ -73,19 +92,16 @@ public class PersistenciaInventarios {
             boolean coincideNombre = true;
             boolean coincideCantidad = true;
 
-       
             if (nombreFiltro != null && !nombreFiltro.trim().isEmpty()) {
                 if (!equipo.getNombre().toLowerCase().contains(nombreFiltro.toLowerCase())) {
                     coincideNombre = false;
                 }
             }
         
-         
             if (equipo.getCantidad() < cantidadMinima || equipo.getCantidad() > cantidadMaxima) {
                 coincideCantidad = false;
             }
 
-       
             if (coincideNombre && coincideCantidad) {
                 equiposFiltrados.add(equipo);
             }
@@ -94,7 +110,11 @@ public class PersistenciaInventarios {
         return equiposFiltrados;
     }
     
-    
+    /**
+     * método para eliminar un equipo
+     * @param idEquipo
+     * @throws Exception si no se encuentra
+     */
     public void eliminarEquipoMedico(int idEquipo) throws Exception {
         EquipoMedico equipoAEliminar = null;
         for (EquipoMedico equipo : inventarios) {
@@ -111,6 +131,11 @@ public class PersistenciaInventarios {
         }
     }
     
+    /**
+     * método para actualizar un equipo médico
+     * @param equipoActualizado
+     * @throws Exception si no se encuentra
+     */
     public void actualizarEquipoMedico(EquipoMedico equipoActualizado) throws Exception {
         boolean encontrado = false;
         for (int i = 0; i < inventarios.size(); i++) {
@@ -126,6 +151,12 @@ public class PersistenciaInventarios {
         }
     }
     
+    /**
+     * método para inventariar un equipo
+     * @param id del equipo
+     * @param cantidadAñadir
+     * @throws Exception si es invalido
+     */
     public void inventariarEquipoMedico(int id, int cantidadAñadir) throws Exception {
         EquipoMedico equipoExistente = null;
         for (EquipoMedico equipo : inventarios) {
@@ -147,6 +178,12 @@ public class PersistenciaInventarios {
         equipoExistente.setCantidad(nuevaCantidad);
     }
     
+    /**
+     * método para desinventariar un equipo
+     * @param id
+     * @param cantidadQuitar
+     * @throws Exception si es invalido
+     */
     public void desinventariarEquipoMedico(int id, int cantidadQuitar) throws Exception {
 
         EquipoMedico equipoExistente = null;

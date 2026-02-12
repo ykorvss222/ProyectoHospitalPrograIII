@@ -1,11 +1,6 @@
 package Persistencia;
 
 import Entidades.*;
-
-/**
- *
- * @author Enrique Osuna
- */
 import java.util.List;
 
 public interface IPersistenciaFachada {
