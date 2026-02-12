@@ -162,6 +162,10 @@ public void inventariarEquipoMedico(int id, int cantidadAñadir) throws Exceptio
     persistenciaInventarios.inventariarEquipoMedico(id, cantidadAñadir);
 }
 
+public void desinventariarEquipoMedico(int id, int cantidadQuitar) throws Exception {
+    persistenciaInventarios.desinventariarEquipoMedico(id, cantidadQuitar);
+}
+
     // =========================
     //      CONSULTAS
     // =========================

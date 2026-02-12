@@ -26,10 +26,8 @@ public interface IPersistenciaFachada {
     void agregarMedico(Medico medico) throws Exception;
     Medico obtenerMedicoPorId(int id) throws Exception; 
     List<Medico> listarMedicos() throws Exception;
-    
     public void actualizarMedico(Medico actualizarMedico) throws Exception; 
-     
-      public void eliminarMedico(Medico medicos) throws Exception;
+    public void eliminarMedico(Medico medicos) throws Exception;
     
 
     // Especialidades
@@ -41,11 +39,12 @@ public interface IPersistenciaFachada {
     void agregarEquipoMedico(EquipoMedico equipo) throws Exception;
     void actualizarCantidadEquipo(int id, int cantidad) throws Exception;
     List<EquipoMedico> listarEquiposMedicos() throws Exception;
-       public EquipoMedico obtenerEquipoPorId(int id) throws Exception;
+    public EquipoMedico obtenerEquipoPorId(int id) throws Exception;
     public List<EquipoMedico> filtrarEquipos(String nombreFiltro, int cantidadMinima, int cantidadMaxima) throws Exception;
     public void eliminarEquipoMedico(EquipoMedico equipo) throws Exception;
-     public void actualizarEquipoMedico(EquipoMedico equipo) throws Exception;
+    public void actualizarEquipoMedico(EquipoMedico equipo) throws Exception;
     public void inventariarEquipoMedico(int id, int cantidadAñadir) throws Exception;
+    public void desinventariarEquipoMedico(int id, int cantidadQuitar) throws Exception;
     
     // Consultas
     void programarConsulta(Consulta consulta) throws Exception;
