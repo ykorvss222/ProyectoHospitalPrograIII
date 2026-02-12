@@ -145,7 +145,7 @@ public class MenuPrincipal extends JFrame implements IAgregarPaciente {
         //  aqui creamos el menu de la tabla
           
         JMenuBar barraMenu = new JMenuBar();
-        JMenu menu = new JMenu("Opciones");
+        JMenu menu = new JMenu("-> Agregar <-");
                     
         JMenuItem agregarPaciente = new JMenuItem("Agregar paciente");
         JMenuItem agregarMedico = new JMenuItem("Agregar medico");
