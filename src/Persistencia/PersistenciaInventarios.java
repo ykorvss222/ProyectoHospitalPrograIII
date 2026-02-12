@@ -1,5 +1,4 @@
- 
-package Persistencia;
+ package Persistencia;
 
 
 import Entidades.EquipoMedico;

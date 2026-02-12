@@ -3,7 +3,6 @@ package com.mycompany.proyectoprogramacion3;
 
 import Menu.MenuPrincipal;
 import Persistencia.*;
-import javax.swing.SwingUtilities;
 
 
  
