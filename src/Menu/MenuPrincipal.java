@@ -146,6 +146,7 @@ public class MenuPrincipal extends JFrame implements IAgregarPaciente {
           
         JMenuBar barraMenu = new JMenuBar();
         JMenu menu = new JMenu("-> Agregar <-");
+        menu.setForeground(new Color(0, 153, 0));
                     
         JMenuItem agregarPaciente = new JMenuItem("Agregar paciente");
         JMenuItem agregarMedico = new JMenuItem("Agregar medico");
